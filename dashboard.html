@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Dashboard | JobAnalyzer</title>
+  <meta name="description" content="Your AI-powered job market dashboard. View analytics, salary insights, and career recommendations.">
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Ctext x='50' y='68' font-size='50' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'%3EAI%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-body">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="nav-brand">
+        <div class="logo-icon"><span>AI</span></div>
+        <span class="brand-name sidebar-text">JobAnalyzer</span>
+      </a>
+      <button class="sidebar-collapse" id="sidebarCollapse" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <i class="fas fa-angles-left"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <a href="#" class="sidebar-link active" data-section="dashboard" onclick="switchSection('dashboard', this)">
+          <i class="fas fa-grid-2"></i>
+          <span class="sidebar-text">Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="analytics" onclick="switchSection('analytics', this)">
+          <i class="fas fa-chart-mixed"></i>
+          <span class="sidebar-text">Job Analytics</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="salary" onclick="switchSection('salary', this)">
+          <i class="fas fa-indian-rupee-sign"></i>
+          <span class="sidebar-text">Salary Insights</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="skills" onclick="switchSection('skills', this)">
+          <i class="fas fa-crosshairs"></i>
+          <span class="sidebar-text">Skill Gap Analyzer</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="resume" onclick="switchSection('resume', this)">
+          <i class="fas fa-file-lines"></i>
+          <span class="sidebar-text">Resume Analyzer</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="coach" onclick="switchSection('coach', this)">
+          <i class="fas fa-robot"></i>
+          <span class="sidebar-text">AI Career Coach</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="predictions" onclick="switchSection('predictions', this)">
+          <i class="fas fa-crystal-ball"></i>
+          <span class="sidebar-text">Predictions</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="saved" onclick="switchSection('saved', this)">
+          <i class="fas fa-bookmark"></i>
+          <span class="sidebar-text">Saved Jobs</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="datamanager" onclick="switchSection('datamanager', this)">
+          <i class="fas fa-database"></i>
+          <span class="sidebar-text">Data Manager</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title sidebar-text">Account</div>
+        <a href="#" class="sidebar-link" data-section="profile" onclick="switchSection('profile', this)">
+          <i class="fas fa-user"></i>
+          <span class="sidebar-text">Profile</span>
+        </a>
+        <a href="#" class="sidebar-link" data-section="settings" onclick="switchSection('settings', this)">
+          <i class="fas fa-gear"></i>
+          <span class="sidebar-text">Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" class="sidebar-link logout-link" onclick="handleLogout()">
+        <i class="fas fa-right-from-bracket"></i>
+        <span class="sidebar-text">Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="mobile-sidebar-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="topbar-left">
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search anything..." id="globalSearch" onkeyup="handleSearch(event)">
+          <kbd>⌘K</kbd>
+        </div>
+        <button class="topbar-btn notification-btn" id="notifBtn" onclick="toggleNotifications()">
+          <i class="fas fa-bell"></i>
+          <span class="notif-badge">3</span>
+        </button>
+        <div class="user-menu" onclick="toggleUserMenu()">
+          <div class="user-avatar">A</div>
+          <div class="user-info">
+            <span class="user-name" id="userName">Arjun R</span>
+            <span class="user-role"><i class="fas fa-gem"></i> Premium</span>
+          </div>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+
+      <!-- Notifications Dropdown -->
+      <div class="notifications-dropdown" id="notifDropdown">
+        <div class="notif-header">
+          <h3>Notifications</h3>
+          <button onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item unread">
+            <div class="notif-icon" style="background: linear-gradient(135deg, #3b82f6, #6366f1);"><i class="fas fa-chart-line"></i></div>
+            <div class="notif-content">
+              <p><strong>New Trend Alert:</strong> Python demand surged 12% this week</p>
+              <span>2 hours ago</span>
+            </div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon" style="background: linear-gradient(135deg, #10b981, #06b6d4);"><i class="fas fa-briefcase"></i></div>
+            <div class="notif-content">
+              <p><strong>Job Match:</strong> 15 new jobs matching your profile</p>
+              <span>5 hours ago</span>
+            </div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"><i class="fas fa-star"></i></div>
+            <div class="notif-content">
+              <p><strong>Resume Score:</strong> Your resume improved to 85/100</p>
+              <span>1 day ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Menu Dropdown -->
+      <div class="user-dropdown" id="userDropdown">
+        <a href="#" onclick="switchSection('profile', document.querySelector('[data-section=profile]'))"><i class="fas fa-user"></i> My Profile</a>
+        <a href="#" onclick="switchSection('settings', document.querySelector('[data-section=settings]'))"><i class="fas fa-gear"></i> Settings</a>
+        <a href="#" onclick="switchSection('saved', document.querySelector('[data-section=saved]'))"><i class="fas fa-bookmark"></i> Saved Jobs</a>
+        <hr>
+        <a href="index.html" class="logout" onclick="handleLogout()"><i class="fas fa-right-from-bracket"></i> Logout</a>
+      </div>
+    </header>
+
+    <!-- Dashboard Section -->
+    <section class="content-section active" id="section-dashboard">
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>Welcome back, <span id="welcomeName">Arjun</span>! 👋</h2>
+          <p>Here's what's happening in the job market.</p>
+        </div>
+        <div class="welcome-date" id="currentDate"></div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <div class="dash-stat-info">
+            <span class="dash-stat-label">Total Jobs Analyzed</span>
+            <span class="dash-stat-value" id="statTotalJobs">12,306</span>
+            <span class="dash-stat-change positive"><i class="fas fa-arrow-up"></i> From 3 datasets</span>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="dash-stat-info">
+            <span class="dash-stat-label">Top Companies</span>
+            <span class="dash-stat-value" id="statCompanies">500+</span>
+            <span class="dash-stat-change positive"><i class="fas fa-arrow-up"></i> Across India & Global</span>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+            <i class="fas fa-indian-rupee-sign"></i>
+          </div>
+          <div class="dash-stat-info">
+            <span class="dash-stat-label">Avg Salary</span>
+            <span class="dash-stat-value" id="statAvgSalary">₹14.8 LPA</span>
+            <span class="dash-stat-change positive"><i class="fas fa-arrow-up"></i> Data Science roles</span>
+          </div>
+        </div>
+        <div class="dash-stat-card">
+          <div class="dash-stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+            <i class="fas fa-code"></i>
+          </div>
+          <div class="dash-stat-info">
+            <span class="dash-stat-label">Skills Tracked</span>
+            <span class="dash-stat-value" id="statSkills">20+</span>
+            <span class="dash-stat-change positive"><i class="fas fa-arrow-up"></i> ML leads at 2,376 mentions</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-grid">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-line"></i> Job Trends Over Time</h3>
+            <select class="chart-select" id="trendPeriod" onchange="updateTrendChart()">
+              <option value="6">Last 6 Months</option>
+              <option value="12">Last 12 Months</option>
+              <option value="3">Last 3 Months</option>
+            </select>
+          </div>
+          <div class="chart-body">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="fas fa-code"></i> Top In-Demand Skills</h3>
+            <select class="chart-select">
+              <option>This Month</option>
+              <option>Last Month</option>
+            </select>
+          </div>
+          <div class="chart-body">
+            <div class="skills-bars" id="dashSkillsBars">
+              <!-- Populated dynamically from CSV data -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jobs by Location + AI Chat -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="fas fa-location-dot"></i> Jobs by Location</h3>
+            <select class="chart-select">
+              <option>India</option>
+              <option>Global</option>
+            </select>
+          </div>
+          <div class="chart-body">
+            <div class="location-list" id="dashLocationList">
+              <!-- Populated dynamically from CSV data -->
+            </div>
+            <div class="chart-body" style="height:200px; margin-top:12px;">
+              <canvas id="locationChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Career Assistant -->
+        <div class="chart-card ai-chat-card">
+          <div class="chart-header">
+            <h3><i class="fas fa-robot"></i> AI Career Assistant</h3>
+            <span class="online-badge"><span class="online-dot"></span> Online</span>
+          </div>
+          <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+              <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+              <div class="chat-bubble">
+                <p>Hi Arjun! 👋<br>How can I help you today?</p>
+              </div>
+            </div>
+          </div>
+          <div class="chat-suggestions">
+            <button onclick="sendSuggestion('What skills should I learn?')">What skills should I learn?</button>
+            <button onclick="sendSuggestion('Analyze my resume')">Analyze my resume</button>
+            <button onclick="sendSuggestion('Best career for me')">Best career for me</button>
+            <button onclick="sendSuggestion('Current market trends')">Current market trends</button>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" placeholder="Ask me anything..." id="chatInput" onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <div class="quick-action-card" onclick="switchSection('skills', document.querySelector('[data-section=skills]'))">
+          <div class="qa-icon" style="background: linear-gradient(135deg, #3b82f6, #6366f1);"><i class="fas fa-crosshairs"></i></div>
+          <div class="qa-info">
+            <h4>Skill Gap Analyzer</h4>
+            <p>Find skills you need to grow your career</p>
+          </div>
+          <i class="fas fa-arrow-right qa-arrow"></i>
+        </div>
+        <div class="quick-action-card" onclick="switchSection('resume', document.querySelector('[data-section=resume]'))">
+          <div class="qa-icon" style="background: linear-gradient(135deg, #10b981, #06b6d4);"><i class="fas fa-file-lines"></i></div>
+          <div class="qa-info">
+            <h4>Resume Analyzer</h4>
+            <p>Get AI-powered resume analysis & suggestions</p>
+          </div>
+          <i class="fas fa-arrow-right qa-arrow"></i>
+        </div>
+        <div class="quick-action-card" onclick="switchSection('coach', document.querySelector('[data-section=coach]'))">
+          <div class="qa-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"><i class="fas fa-robot"></i></div>
+          <div class="qa-info">
+            <h4>AI Career Coach</h4>
+            <p>Get personalized career guidance from AI</p>
+          </div>
+          <i class="fas fa-arrow-right qa-arrow"></i>
+        </div>
+        <div class="quick-action-card" onclick="switchSection('predictions', document.querySelector('[data-section=predictions]'))">
+          <div class="qa-icon" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);"><i class="fas fa-crystal-ball"></i></div>
+          <div class="qa-info">
+            <h4>Future Predictions</h4>
+            <p>Discover future skills & job market predictions</p>
+          </div>
+          <i class="fas fa-arrow-right qa-arrow"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- Job Analytics Section -->
+    <section class="content-section" id="section-analytics">
+      <div class="section-page-header">
+        <h2><i class="fas fa-chart-mixed"></i> Job Analytics</h2>
+        <p>Comprehensive job market analysis with real-time data and AI insights</p>
+      </div>
+      <div class="analytics-filters">
+        <select class="filter-select" onchange="updateAnalytics()"><option>All Industries</option><option>Technology</option><option>Finance</option><option>Healthcare</option><option>Education</option></select>
+        <select class="filter-select" onchange="updateAnalytics()"><option>All Locations</option><option>Bangalore</option><option>Delhi NCR</option><option>Mumbai</option><option>Hyderabad</option></select>
+        <select class="filter-select" onchange="updateAnalytics()"><option>All Experience</option><option>Fresher (0-1 yr)</option><option>Junior (1-3 yrs)</option><option>Mid (3-6 yrs)</option><option>Senior (6+ yrs)</option></select>
+        <button class="btn btn-primary btn-sm" onclick="updateAnalytics()"><i class="fas fa-filter"></i> Apply</button>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header"><h3>Jobs by Industry</h3></div>
+          <div class="chart-body"><canvas id="industryChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><h3>Work Mode Distribution</h3></div>
+          <div class="chart-body"><canvas id="workModeChart"></canvas></div>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header"><h3>Experience Level Demand</h3></div>
+          <div class="chart-body"><canvas id="experienceChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><h3>Job Postings Timeline</h3></div>
+          <div class="chart-body"><canvas id="timelineChart"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-top: 20px;">
+        <div class="chart-header"><h3>Top Job Titles</h3></div>
+        <div class="chart-body">
+          <table class="data-table">
+            <thead><tr><th>Rank</th><th>Job Title</th><th>Openings</th><th>Avg Salary</th><th>Growth</th><th>Trend</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><i class="fas fa-brain" style="color:#3b82f6;"></i> Data Scientist</td><td>4,520</td><td>₹18.5 LPA</td><td class="positive">+24%</td><td><i class="fas fa-arrow-trend-up" style="color:#10b981;"></i></td></tr>
+              <tr><td>2</td><td><i class="fas fa-code" style="color:#8b5cf6;"></i> Full Stack Developer</td><td>3,890</td><td>₹15.2 LPA</td><td class="positive">+18%</td><td><i class="fas fa-arrow-trend-up" style="color:#10b981;"></i></td></tr>
+              <tr><td>3</td><td><i class="fas fa-cloud" style="color:#06b6d4;"></i> Cloud Architect</td><td>2,750</td><td>₹25.0 LPA</td><td class="positive">+32%</td><td><i class="fas fa-arrow-trend-up" style="color:#10b981;"></i></td></tr>
+              <tr><td>4</td><td><i class="fas fa-robot" style="color:#f59e0b;"></i> ML Engineer</td><td>2,340</td><td>₹22.0 LPA</td><td class="positive">+28%</td><td><i class="fas fa-arrow-trend-up" style="color:#10b981;"></i></td></tr>
+              <tr><td>5</td><td><i class="fas fa-shield-halved" style="color:#ef4444;"></i> Cybersecurity Analyst</td><td>1,980</td><td>₹16.8 LPA</td><td class="positive">+15%</td><td><i class="fas fa-arrow-trend-up" style="color:#10b981;"></i></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Salary Insights Section -->
+    <section class="content-section" id="section-salary">
+      <div class="section-page-header">
+        <h2><i class="fas fa-indian-rupee-sign"></i> Salary Insights</h2>
+        <p>Comprehensive salary data and comparison tools powered by AI</p>
+      </div>
+      <div class="salary-comparison">
+        <div class="comparison-input">
+          <h3>Compare Salaries</h3>
+          <div class="comparison-form">
+            <div class="input-group">
+              <i class="fas fa-briefcase"></i>
+              <input type="text" placeholder="Enter job title (e.g., Data Scientist)" id="salaryRole" value="Data Scientist">
+            </div>
+            <div class="input-group">
+              <i class="fas fa-location-dot"></i>
+              <input type="text" placeholder="Location" id="salaryLocation" value="Bangalore">
+            </div>
+            <div class="input-group">
+              <i class="fas fa-clock"></i>
+              <select id="salaryExp">
+                <option>0-2 years</option>
+                <option selected>3-5 years</option>
+                <option>5-8 years</option>
+                <option>8+ years</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="compareSalary()"><i class="fas fa-search"></i> Compare</button>
+          </div>
+        </div>
+        <div class="salary-result" id="salaryResult">
+          <div class="salary-range-card">
+            <h4>Data Scientist - Bangalore (3-5 yrs)</h4>
+            <div class="salary-range-visual">
+              <div class="salary-marker min"><span>₹8 LPA</span><small>Min</small></div>
+              <div class="salary-bar-track">
+                <div class="salary-bar-range" style="left:15%; width:55%;"></div>
+                <div class="salary-bar-median" style="left:42%;"><span>₹15.5 LPA</span><small>Median</small></div>
+              </div>
+              <div class="salary-marker max"><span>₹28 LPA</span><small>Max</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header"><h3>Salary by Role</h3></div>
+          <div class="chart-body"><canvas id="salaryRoleChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><h3>Salary by Experience</h3></div>
+          <div class="chart-body"><canvas id="salaryExpChart"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-card" style="margin-top:20px;">
+        <div class="chart-header"><h3><i class="fas fa-lightbulb"></i> AI Salary Negotiation Tips</h3></div>
+        <div class="tips-grid">
+          <div class="tip-card"><div class="tip-icon"><i class="fas fa-chart-line"></i></div><h4>Know Your Worth</h4><p>Based on current market data, your skills are valued at ₹14-18 LPA in Bangalore. Use this benchmark in negotiations.</p></div>
+          <div class="tip-card"><div class="tip-icon"><i class="fas fa-clock"></i></div><h4>Timing Matters</h4><p>Companies have highest hiring budgets in Q1 (Jan-Mar) and Q3 (Jul-Sep). Plan your switch accordingly.</p></div>
+          <div class="tip-card"><div class="tip-icon"><i class="fas fa-certificate"></i></div><h4>Certifications Help</h4><p>AWS/GCP certifications can increase your salary by 15-25%. Consider investing in cloud certifications.</p></div>
+          <div class="tip-card"><div class="tip-icon"><i class="fas fa-handshake"></i></div><h4>Counter Effectively</h4><p>Always counter the first offer by 15-20%. Companies typically have a 10-15% buffer built into initial offers.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skill Gap Analyzer Section -->
+    <section class="content-section" id="section-skills">
+      <div class="section-page-header">
+        <h2><i class="fas fa-crosshairs"></i> Skill Gap Analyzer</h2>
+        <p>Identify gaps between your current skills and dream job requirements</p>
+      </div>
+      <div class="skill-analyzer">
+        <div class="skill-input-panel">
+          <h3>Your Current Skills</h3>
+          <div class="skill-tags" id="currentSkillTags">
+            <span class="skill-tag">Python <button onclick="removeSkill(this)">×</button></span>
+            <span class="skill-tag">JavaScript <button onclick="removeSkill(this)">×</button></span>
+            <span class="skill-tag">SQL <button onclick="removeSkill(this)">×</button></span>
+            <span class="skill-tag">HTML/CSS <button onclick="removeSkill(this)">×</button></span>
+          </div>
+          <div class="skill-add">
+            <input type="text" placeholder="Add a skill..." id="newSkillInput" onkeydown="if(event.key==='Enter')addSkill()">
+            <button class="btn btn-primary btn-sm" onclick="addSkill()"><i class="fas fa-plus"></i></button>
+          </div>
+          <h3 style="margin-top:24px;">Target Role</h3>
+          <select class="filter-select" style="width:100%;" id="targetRole" onchange="analyzeSkillGap()">
+            <option>Data Scientist</option>
+            <option>Full Stack Developer</option>
+            <option>ML Engineer</option>
+            <option>Cloud Architect</option>
+            <option>DevOps Engineer</option>
+            <option>Product Manager</option>
+          </select>
+          <button class="btn btn-primary btn-full" style="margin-top:16px;" onclick="analyzeSkillGap()"><i class="fas fa-crosshairs"></i> Analyze Gap</button>
+        </div>
+        <div class="skill-results-panel" id="skillResults">
+          <div class="skill-gap-chart">
+            <canvas id="skillGapChart"></canvas>
+          </div>
+          <div class="skill-recommendations">
+            <h3>Recommended Learning Path</h3>
+            <div class="learning-path">
+              <div class="path-item">
+                <div class="path-step">1</div>
+                <div class="path-content">
+                  <h4>Machine Learning Fundamentals</h4>
+                  <p>Master supervised/unsupervised learning, model evaluation, and feature engineering</p>
+                  <div class="path-meta"><span><i class="fas fa-clock"></i> 4-6 weeks</span><span class="priority high">High Priority</span></div>
+                </div>
+              </div>
+              <div class="path-item">
+                <div class="path-step">2</div>
+                <div class="path-content">
+                  <h4>Deep Learning & Neural Networks</h4>
+                  <p>Learn TensorFlow/PyTorch, CNN, RNN, and transformer architectures</p>
+                  <div class="path-meta"><span><i class="fas fa-clock"></i> 6-8 weeks</span><span class="priority high">High Priority</span></div>
+                </div>
+              </div>
+              <div class="path-item">
+                <div class="path-step">3</div>
+                <div class="path-content">
+                  <h4>Cloud Platforms (AWS/GCP)</h4>
+                  <p>Deploy ML models, use SageMaker, BigQuery, and cloud-based data pipelines</p>
+                  <div class="path-meta"><span><i class="fas fa-clock"></i> 3-4 weeks</span><span class="priority medium">Medium Priority</span></div>
+                </div>
+              </div>
+              <div class="path-item">
+                <div class="path-step">4</div>
+                <div class="path-content">
+                  <h4>Statistics & Mathematics</h4>
+                  <p>Strengthen probability, linear algebra, and statistical analysis skills</p>
+                  <div class="path-meta"><span><i class="fas fa-clock"></i> 4-5 weeks</span><span class="priority medium">Medium Priority</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Resume Analyzer Section -->
+    <section class="content-section" id="section-resume">
+      <div class="section-page-header">
+        <h2><i class="fas fa-file-lines"></i> AI Resume Analyzer</h2>
+        <p>Upload your resume and let our AI extract skills, match jobs, and build your personalized career roadmap</p>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="ra-upload-area" id="raUploadArea">
+        <div class="ra-upload-zone" id="raUploadZone" onclick="document.getElementById('raFileInput').click()">
+          <input type="file" id="raFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="handleResumeAnalysis(event)">
+          <div class="ra-upload-icon-wrap">
+            <div class="ra-upload-glow"></div>
+            <i class="fas fa-cloud-arrow-up"></i>
+          </div>
+          <h3>Drop your resume here</h3>
+          <p>or <span class="ra-browse-link">click to browse</span></p>
+          <div class="ra-upload-formats">
+            <span><i class="fas fa-file-pdf"></i> PDF</span>
+            <span><i class="fas fa-file-word"></i> DOC</span>
+            <span><i class="fas fa-file-word"></i> DOCX</span>
+          </div>
+          <span class="ra-upload-hint">Maximum file size: 5MB</span>
+        </div>
+        <div class="ra-features-strip">
+          <div class="ra-feature-chip"><i class="fas fa-brain"></i> AI Skill Extraction</div>
+          <div class="ra-feature-chip"><i class="fas fa-bullseye"></i> ATS Scoring</div>
+          <div class="ra-feature-chip"><i class="fas fa-briefcase"></i> Job Matching</div>
+          <div class="ra-feature-chip"><i class="fas fa-road"></i> Learning Path</div>
+        </div>
+      </div>
+
+      <!-- AI Processing Progress -->
+      <div class="ra-progress-area" id="raProgressArea" style="display:none;">
+        <div class="ra-progress-card">
+          <div class="ra-progress-brain">
+            <div class="ra-brain-pulse"></div>
+            <i class="fas fa-brain"></i>
+          </div>
+          <h3>AI is analyzing your resume...</h3>
+          <div class="ra-progress-steps">
+            <div class="ra-step active" id="raStep1">
+              <div class="ra-step-dot"><i class="fas fa-check"></i></div>
+              <span>Extracting Text</span>
+            </div>
+            <div class="ra-step-line" id="raLine1"></div>
+            <div class="ra-step" id="raStep2">
+              <div class="ra-step-dot"><i class="fas fa-check"></i></div>
+              <span>Analyzing Skills</span>
+            </div>
+            <div class="ra-step-line" id="raLine2"></div>
+            <div class="ra-step" id="raStep3">
+              <div class="ra-step-dot"><i class="fas fa-check"></i></div>
+              <span>Matching Jobs</span>
+            </div>
+            <div class="ra-step-line" id="raLine3"></div>
+            <div class="ra-step" id="raStep4">
+              <div class="ra-step-dot"><i class="fas fa-check"></i></div>
+              <span>Generating Insights</span>
+            </div>
+          </div>
+          <div class="ra-progress-bar-wrap">
+            <div class="ra-progress-bar" id="raProgressBar"></div>
+          </div>
+          <p class="ra-progress-tip" id="raProgressTip">Reading document contents...</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="ra-error-area" id="raErrorArea" style="display:none;">
+        <div class="ra-error-card">
+          <div class="ra-error-icon"><i class="fas fa-circle-exclamation"></i></div>
+          <h3 id="raErrorTitle">Analysis Failed</h3>
+          <p id="raErrorMsg">Something went wrong. Please try again.</p>
+          <button class="btn btn-primary" onclick="resetResumeAnalyzer()"><i class="fas fa-redo"></i> Try Again</button>
+        </div>
+      </div>
+
+      <!-- Results Dashboard -->
+      <div class="ra-results" id="raResults" style="display:none;">
+
+        <!-- Header with file info and re-upload -->
+        <div class="ra-results-header">
+          <div class="ra-file-info">
+            <i class="fas fa-file-circle-check"></i>
+            <div>
+              <strong id="raFileName">resume.pdf</strong>
+              <span id="raWordCount">0 words analyzed</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="resetResumeAnalyzer()"><i class="fas fa-upload"></i> Analyze Another</button>
+        </div>
+
+        <!-- Score + Breakdown Row -->
+        <div class="ra-score-row">
+          <div class="ra-score-card">
+            <div class="ra-score-circle">
+              <svg viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="78" stroke="rgba(255,255,255,0.05)" stroke-width="12" fill="none"/>
+                <circle cx="90" cy="90" r="78" stroke="url(#raScoreGrad)" stroke-width="12" fill="none"
+                        stroke-dasharray="490.09" stroke-dashoffset="490.09" stroke-linecap="round"
+                        id="raScoreCircle" style="transform: rotate(-90deg); transform-origin: center;"/>
+                <defs>
+                  <linearGradient id="raScoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#3b82f6"/>
+                    <stop offset="50%" stop-color="#8b5cf6"/>
+                    <stop offset="100%" stop-color="#10b981"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="ra-score-text">
+                <span class="ra-score-num" id="raScoreNum">0</span>
+                <span class="ra-score-label">ATS Score</span>
+              </div>
+            </div>
+            <div class="ra-score-grade" id="raScoreGrade">
+              <span class="ra-grade-badge">A+</span>
+              <span>Excellent</span>
+            </div>
+          </div>
+          <div class="ra-breakdown-card">
+            <h3><i class="fas fa-chart-bar"></i> Score Breakdown</h3>
+            <div class="ra-breakdown-list" id="raBreakdownList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Extracted Skills -->
+        <div class="ra-section-card">
+          <div class="ra-section-header">
+            <h3><i class="fas fa-code"></i> Extracted Skills</h3>
+            <span class="ra-skill-count" id="raSkillCount">0 skills found</span>
+          </div>
+          <div class="ra-skills-cloud" id="raSkillsCloud">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Job Matches -->
+        <div class="ra-section-card">
+          <div class="ra-section-header">
+            <h3><i class="fas fa-briefcase"></i> Best Job Matches</h3>
+            <span class="ra-match-subtitle">Based on your extracted skills</span>
+          </div>
+          <div class="ra-jobs-grid" id="raJobsGrid">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Skills to Learn + Radar Chart -->
+        <div class="ra-two-col">
+          <div class="ra-section-card ra-learn-card">
+            <div class="ra-section-header">
+              <h3><i class="fas fa-graduation-cap"></i> Skills to Learn</h3>
+              <span class="ra-match-subtitle">Prioritized learning path</span>
+            </div>
+            <div class="ra-learning-path" id="raLearningPath">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+          <div class="ra-section-card">
+            <div class="ra-section-header">
+              <h3><i class="fas fa-chart-radar"></i> Skill Match Radar</h3>
+            </div>
+            <div class="ra-radar-wrap">
+              <canvas id="raRadarChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Insights -->
+        <div class="ra-insights-row">
+          <div class="ra-section-card ra-strengths-card">
+            <div class="ra-section-header">
+              <h3><i class="fas fa-check-circle" style="color:#10b981;"></i> Strengths</h3>
+            </div>
+            <ul class="ra-insight-list" id="raStrengthsList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+          <div class="ra-section-card ra-improve-card">
+            <div class="ra-section-header">
+              <h3><i class="fas fa-lightbulb" style="color:#f59e0b;"></i> Areas to Improve</h3>
+            </div>
+            <ul class="ra-insight-list" id="raImprovementsList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- AI Career Coach Section -->
+    <section class="content-section" id="section-coach">
+      <div class="section-page-header">
+        <h2><i class="fas fa-robot"></i> AI Career Coach</h2>
+        <p>Get personalized career guidance and action plans from our advanced AI</p>
+      </div>
+      <div class="coach-container">
+        <div class="coach-sidebar">
+          <h3>Quick Topics</h3>
+          <button class="coach-topic active" onclick="askCoach('career path', this)"><i class="fas fa-route"></i> Career Path Planning</button>
+          <button class="coach-topic" onclick="askCoach('interview', this)"><i class="fas fa-comments"></i> Interview Preparation</button>
+          <button class="coach-topic" onclick="askCoach('skills', this)"><i class="fas fa-graduation-cap"></i> Skill Development</button>
+          <button class="coach-topic" onclick="askCoach('salary', this)"><i class="fas fa-indian-rupee-sign"></i> Salary Negotiation</button>
+          <button class="coach-topic" onclick="askCoach('switch', this)"><i class="fas fa-shuffle"></i> Career Switch</button>
+          <button class="coach-topic" onclick="askCoach('resume', this)"><i class="fas fa-file-lines"></i> Resume Tips</button>
+          <button class="coach-topic" onclick="askCoach('networking', this)"><i class="fas fa-users"></i> Networking</button>
+          <button class="coach-topic" onclick="askCoach('goals', this)"><i class="fas fa-bullseye"></i> Goal Setting</button>
+        </div>
+        <div class="coach-chat-area">
+          <div class="coach-messages" id="coachMessages">
+            <div class="chat-message bot">
+              <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+              <div class="chat-bubble">
+                <p>Hello! I'm your AI Career Coach. 🎯</p>
+                <p>I can help you with career planning, interview prep, salary negotiation, skill development, and much more. What would you like to discuss today?</p>
+              </div>
+            </div>
+          </div>
+          <div class="coach-input-area">
+            <input type="text" placeholder="Ask your career question..." id="coachInput" onkeydown="if(event.key==='Enter')sendCoachMessage()">
+            <button class="chat-send-btn" onclick="sendCoachMessage()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Predictions Section -->
+    <section class="content-section" id="section-predictions">
+      <div class="section-page-header">
+        <h2><i class="fas fa-crystal-ball"></i> Future Predictions</h2>
+        <p>AI-powered predictions for future skill demands and career opportunities</p>
+      </div>
+      <div class="predictions-grid">
+        <div class="prediction-card">
+          <div class="prediction-header"><i class="fas fa-fire" style="color:#ef4444;"></i><h3>Hot Skills in 2027</h3></div>
+          <div class="prediction-list">
+            <div class="prediction-item"><span class="pred-rank">1</span><span class="pred-name">Generative AI / LLMs</span><span class="pred-growth positive">+156%</span></div>
+            <div class="prediction-item"><span class="pred-rank">2</span><span class="pred-name">Prompt Engineering</span><span class="pred-growth positive">+134%</span></div>
+            <div class="prediction-item"><span class="pred-rank">3</span><span class="pred-name">MLOps</span><span class="pred-growth positive">+98%</span></div>
+            <div class="prediction-item"><span class="pred-rank">4</span><span class="pred-name">Edge Computing</span><span class="pred-growth positive">+87%</span></div>
+            <div class="prediction-item"><span class="pred-rank">5</span><span class="pred-name">Quantum Computing</span><span class="pred-growth positive">+76%</span></div>
+          </div>
+        </div>
+        <div class="prediction-card">
+          <div class="prediction-header"><i class="fas fa-industry" style="color:#3b82f6;"></i><h3>Growing Industries</h3></div>
+          <div class="prediction-list">
+            <div class="prediction-item"><span class="pred-rank">1</span><span class="pred-name">AI & Machine Learning</span><span class="pred-growth positive">+45%</span></div>
+            <div class="prediction-item"><span class="pred-rank">2</span><span class="pred-name">Clean Energy Tech</span><span class="pred-growth positive">+38%</span></div>
+            <div class="prediction-item"><span class="pred-rank">3</span><span class="pred-name">Healthcare AI</span><span class="pred-growth positive">+35%</span></div>
+            <div class="prediction-item"><span class="pred-rank">4</span><span class="pred-name">Cybersecurity</span><span class="pred-growth positive">+32%</span></div>
+            <div class="prediction-item"><span class="pred-rank">5</span><span class="pred-name">FinTech</span><span class="pred-growth positive">+28%</span></div>
+          </div>
+        </div>
+        <div class="prediction-card">
+          <div class="prediction-header"><i class="fas fa-rocket" style="color:#8b5cf6;"></i><h3>Emerging Roles</h3></div>
+          <div class="prediction-list">
+            <div class="prediction-item"><span class="pred-rank">1</span><span class="pred-name">AI Ethics Officer</span><span class="pred-growth positive">New</span></div>
+            <div class="prediction-item"><span class="pred-rank">2</span><span class="pred-name">LLM Fine-tuning Specialist</span><span class="pred-growth positive">New</span></div>
+            <div class="prediction-item"><span class="pred-rank">3</span><span class="pred-name">Digital Twin Engineer</span><span class="pred-growth positive">+120%</span></div>
+            <div class="prediction-item"><span class="pred-rank">4</span><span class="pred-name">AI Safety Researcher</span><span class="pred-growth positive">New</span></div>
+            <div class="prediction-item"><span class="pred-rank">5</span><span class="pred-name">Sustainability Analyst</span><span class="pred-growth positive">+95%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="charts-grid" style="margin-top:20px;">
+        <div class="chart-card wide">
+          <div class="chart-header"><h3>Skill Demand Forecast (2026-2030)</h3></div>
+          <div class="chart-body"><canvas id="forecastChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Saved Jobs Section -->
+    <section class="content-section" id="section-saved">
+      <div class="section-page-header">
+        <h2><i class="fas fa-bookmark"></i> Saved Jobs</h2>
+        <p>Your bookmarked job opportunities and application tracker</p>
+      </div>
+      <div class="saved-filters">
+        <div class="search-bar" style="max-width:400px;">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search saved jobs...">
+        </div>
+        <div class="filter-pills">
+          <button class="pill active" onclick="filterSavedJobs('all', this)">All</button>
+          <button class="pill" onclick="filterSavedJobs('applied', this)">Applied</button>
+          <button class="pill" onclick="filterSavedJobs('interview', this)">Interview</button>
+          <button class="pill" onclick="filterSavedJobs('wishlist', this)">Wishlist</button>
+        </div>
+      </div>
+      <div class="saved-jobs-grid" id="savedJobsGrid">
+        <div class="job-card" data-status="applied">
+          <div class="job-card-header">
+            <div class="company-logo" style="background: linear-gradient(135deg, #4285f4, #34a853);">G</div>
+            <div class="job-info"><h4>Senior Data Scientist</h4><span>Google • Bangalore</span></div>
+            <span class="job-status applied">Applied</span>
+          </div>
+          <div class="job-tags"><span>Python</span><span>ML</span><span>TensorFlow</span><span>BigQuery</span></div>
+          <div class="job-details"><span><i class="fas fa-indian-rupee-sign"></i> ₹25-35 LPA</span><span><i class="fas fa-clock"></i> Full-time</span><span><i class="fas fa-building"></i> Hybrid</span></div>
+          <div class="job-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Opening application tracker...', 'info')"><i class="fas fa-external-link"></i> View</button><button class="btn btn-sm btn-ghost" onclick="unsaveJob(this)"><i class="fas fa-bookmark"></i></button></div>
+        </div>
+        <div class="job-card" data-status="interview">
+          <div class="job-card-header">
+            <div class="company-logo" style="background: linear-gradient(135deg, #0078d4, #00bcf2);">M</div>
+            <div class="job-info"><h4>ML Engineer</h4><span>Microsoft • Hyderabad</span></div>
+            <span class="job-status interview">Interview</span>
+          </div>
+          <div class="job-tags"><span>Python</span><span>PyTorch</span><span>Azure</span><span>MLOps</span></div>
+          <div class="job-details"><span><i class="fas fa-indian-rupee-sign"></i> ₹28-40 LPA</span><span><i class="fas fa-clock"></i> Full-time</span><span><i class="fas fa-building"></i> On-site</span></div>
+          <div class="job-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Opening application tracker...', 'info')"><i class="fas fa-external-link"></i> View</button><button class="btn btn-sm btn-ghost" onclick="unsaveJob(this)"><i class="fas fa-bookmark"></i></button></div>
+        </div>
+        <div class="job-card" data-status="wishlist">
+          <div class="job-card-header">
+            <div class="company-logo" style="background: linear-gradient(135deg, #ff9900, #146eb4);">A</div>
+            <div class="job-info"><h4>AI Research Scientist</h4><span>Amazon • Bangalore</span></div>
+            <span class="job-status wishlist">Wishlist</span>
+          </div>
+          <div class="job-tags"><span>Python</span><span>NLP</span><span>AWS</span><span>Research</span></div>
+          <div class="job-details"><span><i class="fas fa-indian-rupee-sign"></i> ₹35-50 LPA</span><span><i class="fas fa-clock"></i> Full-time</span><span><i class="fas fa-building"></i> Hybrid</span></div>
+          <div class="job-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Opening application tracker...', 'info')"><i class="fas fa-external-link"></i> View</button><button class="btn btn-sm btn-ghost" onclick="unsaveJob(this)"><i class="fas fa-bookmark"></i></button></div>
+        </div>
+        <div class="job-card" data-status="wishlist">
+          <div class="job-card-header">
+            <div class="company-logo" style="background: linear-gradient(135deg, #e50914, #b81d24);">N</div>
+            <div class="job-info"><h4>Data Engineer</h4><span>Netflix • Remote (India)</span></div>
+            <span class="job-status wishlist">Wishlist</span>
+          </div>
+          <div class="job-tags"><span>Spark</span><span>Python</span><span>Kafka</span><span>AWS</span></div>
+          <div class="job-details"><span><i class="fas fa-indian-rupee-sign"></i> ₹30-45 LPA</span><span><i class="fas fa-clock"></i> Full-time</span><span><i class="fas fa-building"></i> Remote</span></div>
+          <div class="job-actions"><button class="btn btn-sm btn-outline" onclick="showToast('Opening application tracker...', 'info')"><i class="fas fa-external-link"></i> View</button><button class="btn btn-sm btn-ghost" onclick="unsaveJob(this)"><i class="fas fa-bookmark"></i></button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section class="content-section" id="section-profile">
+      <div class="section-page-header">
+        <h2><i class="fas fa-user"></i> My Profile</h2>
+        <p>Manage your profile information and preferences</p>
+      </div>
+      <div class="profile-container">
+        <div class="profile-header-card">
+          <div class="profile-cover" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);"></div>
+          <div class="profile-info-section">
+            <div class="profile-avatar">A</div>
+            <div class="profile-details">
+              <h3 id="profileName">Arjun R</h3>
+              <p>Data Scientist | Python Developer</p>
+              <div class="profile-badges"><span class="badge-pill"><i class="fas fa-gem"></i> Premium</span><span class="badge-pill"><i class="fas fa-calendar"></i> Joined Jun 2026</span><span class="badge-pill"><i class="fas fa-location-dot"></i> Bangalore</span></div>
+            </div>
+            <button class="btn btn-outline" onclick="editProfile()"><i class="fas fa-pen"></i> Edit Profile</button>
+          </div>
+        </div>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <h3><i class="fas fa-code"></i> Skills</h3>
+            <div class="skill-tags">
+              <span class="skill-tag">Python</span><span class="skill-tag">JavaScript</span><span class="skill-tag">SQL</span>
+              <span class="skill-tag">Machine Learning</span><span class="skill-tag">TensorFlow</span><span class="skill-tag">AWS</span>
+              <span class="skill-tag">React</span><span class="skill-tag">Node.js</span><span class="skill-tag">Docker</span>
+            </div>
+          </div>
+          <div class="profile-card">
+            <h3><i class="fas fa-briefcase"></i> Experience</h3>
+            <div class="experience-item">
+              <div class="exp-dot"></div>
+              <div class="exp-content"><h4>Senior Data Scientist</h4><p>Wipro Technologies • 2024 - Present</p></div>
+            </div>
+            <div class="experience-item">
+              <div class="exp-dot"></div>
+              <div class="exp-content"><h4>Data Analyst</h4><p>Infosys • 2022 - 2024</p></div>
+            </div>
+            <div class="experience-item">
+              <div class="exp-dot"></div>
+              <div class="exp-content"><h4>Junior Developer</h4><p>TCS • 2020 - 2022</p></div>
+            </div>
+          </div>
+          <div class="profile-card">
+            <h3><i class="fas fa-graduation-cap"></i> Education</h3>
+            <div class="experience-item">
+              <div class="exp-dot"></div>
+              <div class="exp-content"><h4>M.Tech in Computer Science</h4><p>IIT Madras • 2018 - 2020</p></div>
+            </div>
+            <div class="experience-item">
+              <div class="exp-dot"></div>
+              <div class="exp-content"><h4>B.Tech in IT</h4><p>Anna University • 2014 - 2018</p></div>
+            </div>
+          </div>
+          <div class="profile-card">
+            <h3><i class="fas fa-certificate"></i> Certifications</h3>
+            <div class="cert-list">
+              <div class="cert-item"><i class="fab fa-aws" style="color:#f59e0b;"></i><div><h4>AWS Solutions Architect</h4><p>Amazon Web Services • 2025</p></div></div>
+              <div class="cert-item"><i class="fab fa-google" style="color:#4285f4;"></i><div><h4>Google Cloud ML Engineer</h4><p>Google Cloud • 2024</p></div></div>
+              <div class="cert-item"><i class="fas fa-database" style="color:#10b981;"></i><div><h4>MongoDB Certified Developer</h4><p>MongoDB University • 2023</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section class="content-section" id="section-settings">
+      <div class="section-page-header">
+        <h2><i class="fas fa-gear"></i> Settings</h2>
+        <p>Customize your experience and manage account preferences</p>
+      </div>
+      <div class="settings-container">
+        <div class="settings-nav">
+          <button class="settings-tab active" onclick="switchSettingsTab('account', this)"><i class="fas fa-user"></i> Account</button>
+          <button class="settings-tab" onclick="switchSettingsTab('notifications', this)"><i class="fas fa-bell"></i> Notifications</button>
+          <button class="settings-tab" onclick="switchSettingsTab('appearance', this)"><i class="fas fa-palette"></i> Appearance</button>
+          <button class="settings-tab" onclick="switchSettingsTab('privacy', this)"><i class="fas fa-shield-halved"></i> Privacy</button>
+        </div>
+        <div class="settings-content">
+          <div class="settings-panel active" id="settings-account">
+            <h3>Account Settings</h3>
+            <div class="settings-form">
+              <div class="form-group"><label>Full Name</label><input type="text" value="Arjun R" class="settings-input"></div>
+              <div class="form-group"><label>Email</label><input type="email" value="arjun.r@email.com" class="settings-input"></div>
+              <div class="form-group"><label>Phone</label><input type="tel" value="+91 98765 43210" class="settings-input"></div>
+              <div class="form-group"><label>Location</label><input type="text" value="Bangalore, India" class="settings-input"></div>
+              <div class="form-group"><label>Bio</label><textarea class="settings-input" rows="3">Passionate data scientist with expertise in ML, AI, and cloud technologies. Always learning and growing.</textarea></div>
+              <button class="btn btn-primary" onclick="showToast('Settings saved successfully!', 'success')"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+          </div>
+          <div class="settings-panel" id="settings-notifications">
+            <h3>Notification Preferences</h3>
+            <div class="settings-toggles">
+              <div class="setting-toggle"><div><h4>Email Notifications</h4><p>Receive updates and alerts via email</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Job Alerts</h4><p>Get notified about new job matches</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Skill Trend Updates</h4><p>Weekly updates on trending skills</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Salary Insights</h4><p>Monthly salary benchmark reports</p></div><label class="switch"><input type="checkbox"><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Marketing Emails</h4><p>Promotions, tips, and product updates</p></div><label class="switch"><input type="checkbox"><span class="switch-slider"></span></label></div>
+            </div>
+          </div>
+          <div class="settings-panel" id="settings-appearance">
+            <h3>Appearance</h3>
+            <div class="theme-options">
+              <div class="theme-option active" onclick="setTheme('dark', this)"><div class="theme-preview dark-preview"></div><span>Dark</span></div>
+              <div class="theme-option" onclick="setTheme('light', this)"><div class="theme-preview light-preview"></div><span>Light</span></div>
+              <div class="theme-option" onclick="setTheme('system', this)"><div class="theme-preview system-preview"></div><span>System</span></div>
+            </div>
+            <div class="settings-toggles" style="margin-top:24px;">
+              <div class="setting-toggle"><div><h4>Animations</h4><p>Enable smooth animations and transitions</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Compact Mode</h4><p>Reduce spacing for more content</p></div><label class="switch"><input type="checkbox"><span class="switch-slider"></span></label></div>
+            </div>
+          </div>
+          <div class="settings-panel" id="settings-privacy">
+            <h3>Privacy & Security</h3>
+            <div class="settings-toggles">
+              <div class="setting-toggle"><div><h4>Profile Visibility</h4><p>Make your profile visible to recruiters</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Two-Factor Auth</h4><p>Add extra security to your account</p></div><label class="switch"><input type="checkbox"><span class="switch-slider"></span></label></div>
+              <div class="setting-toggle"><div><h4>Data Analytics</h4><p>Share usage data to improve the product</p></div><label class="switch"><input type="checkbox" checked><span class="switch-slider"></span></label></div>
+            </div>
+            <div class="danger-zone">
+              <h4>Danger Zone</h4>
+              <div class="danger-actions">
+                <button class="btn btn-outline" onclick="showToast('Data export started. You will receive an email shortly.', 'info')"><i class="fas fa-download"></i> Export Data</button>
+                <button class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) showToast('Account deletion scheduled.', 'warning')"><i class="fas fa-trash"></i> Delete Account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Data Manager Section -->
+    <section class="content-section" id="section-datamanager">
+      <div class="section-intro">
+        <h2><i class="fas fa-database"></i> Data Manager</h2>
+        <p>Upload, view, and manage your CSV datasets. All data powers the analytics across the dashboard.</p>
+      </div>
+
+      <!-- Dataset Overview Cards -->
+      <div class="dm-stats-grid">
+        <div class="dm-stat-card">
+          <div class="dm-stat-icon" style="background: linear-gradient(135deg, #3b82f6, #6366f1);">
+            <i class="fas fa-table"></i>
+          </div>
+          <div class="dm-stat-info">
+            <span class="dm-stat-value" id="dmTotalRecords">12,306</span>
+            <span class="dm-stat-label">Total Records</span>
+          </div>
+        </div>
+        <div class="dm-stat-card">
+          <div class="dm-stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <div class="dm-stat-info">
+            <span class="dm-stat-value" id="dmDatasetCount">3</span>
+            <span class="dm-stat-label">Datasets Loaded</span>
+          </div>
+        </div>
+        <div class="dm-stat-card">
+          <div class="dm-stat-icon" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="dm-stat-info">
+            <span class="dm-stat-value" id="dmLastUpdated">Just Now</span>
+            <span class="dm-stat-label">Last Updated</span>
+          </div>
+        </div>
+        <div class="dm-stat-card">
+          <div class="dm-stat-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+            <i class="fas fa-hard-drive"></i>
+          </div>
+          <div class="dm-stat-info">
+            <span class="dm-stat-value" id="dmStorageUsed">~2.8 MB</span>
+            <span class="dm-stat-label">Data Size</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="dm-upload-section">
+        <div class="dm-upload-zone" id="dmUploadZone">
+          <input type="file" id="dmFileInput" accept=".csv" style="display:none" onchange="handleDataManagerUpload(event)">
+          <div class="dm-upload-content" onclick="document.getElementById('dmFileInput').click()">
+            <div class="dm-upload-icon">
+              <i class="fas fa-cloud-arrow-up"></i>
+            </div>
+            <h3>Upload CSV Dataset</h3>
+            <p>Drag & drop your CSV file here, or <strong>click to browse</strong></p>
+            <span class="dm-upload-hint">Supports .csv files up to 10MB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loaded Datasets -->
+      <div class="dm-datasets-section">
+        <h3><i class="fas fa-folder-open"></i> Loaded Datasets</h3>
+        <div class="dm-dataset-cards" id="dmDatasetCards">
+          <!-- Dataset 1 -->
+          <div class="dm-dataset-card" data-dataset="naukri_jobs">
+            <div class="dm-dataset-header">
+              <div class="dm-dataset-icon" style="background: linear-gradient(135deg, #3b82f6, #6366f1);">
+                <i class="fas fa-file-csv"></i>
+              </div>
+              <div class="dm-dataset-info">
+                <h4>Data Science Jobs (Naukri)</h4>
+                <span class="dm-dataset-meta">7,505 rows • 7 columns • Data Science_Jobs .csv</span>
+              </div>
+              <div class="dm-dataset-actions">
+                <button class="dm-btn dm-btn-view" onclick="viewDataset('naukri_jobs')"><i class="fas fa-eye"></i> View</button>
+              </div>
+            </div>
+            <div class="dm-dataset-columns">
+              <span class="dm-col-tag">Job Title</span>
+              <span class="dm-col-tag">Company</span>
+              <span class="dm-col-tag">Location</span>
+              <span class="dm-col-tag">Experience</span>
+              <span class="dm-col-tag">Salary</span>
+              <span class="dm-col-tag">Skills</span>
+            </div>
+          </div>
+
+          <!-- Dataset 2 -->
+          <div class="dm-dataset-card" data-dataset="india_salary">
+            <div class="dm-dataset-header">
+              <div class="dm-dataset-icon" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
+                <i class="fas fa-file-csv"></i>
+              </div>
+              <div class="dm-dataset-info">
+                <h4>Data Science Salaries India</h4>
+                <span class="dm-dataset-meta">1,603 rows • 7 columns • Data_Science_Jobs_in_India.csv</span>
+              </div>
+              <div class="dm-dataset-actions">
+                <button class="dm-btn dm-btn-view" onclick="viewDataset('india_salary')"><i class="fas fa-eye"></i> View</button>
+              </div>
+            </div>
+            <div class="dm-dataset-columns">
+              <span class="dm-col-tag">Company</span>
+              <span class="dm-col-tag">Job Title</span>
+              <span class="dm-col-tag">Min Exp</span>
+              <span class="dm-col-tag">Avg Salary</span>
+              <span class="dm-col-tag">Min Salary</span>
+              <span class="dm-col-tag">Max Salary</span>
+            </div>
+          </div>
+
+          <!-- Dataset 3 -->
+          <div class="dm-dataset-card" data-dataset="global_jobs">
+            <div class="dm-dataset-header">
+              <div class="dm-dataset-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                <i class="fas fa-file-csv"></i>
+              </div>
+              <div class="dm-dataset-info">
+                <h4>Global Data Science Jobs</h4>
+                <span class="dm-dataset-meta">3,198 rows • 8 columns • data_science_job.csv</span>
+              </div>
+              <div class="dm-dataset-actions">
+                <button class="dm-btn dm-btn-view" onclick="viewDataset('global_jobs')"><i class="fas fa-eye"></i> View</button>
+              </div>
+            </div>
+            <div class="dm-dataset-columns">
+              <span class="dm-col-tag">Company</span>
+              <span class="dm-col-tag">Job Title</span>
+              <span class="dm-col-tag">Location</span>
+              <span class="dm-col-tag">Job Type</span>
+              <span class="dm-col-tag">Exp Level</span>
+              <span class="dm-col-tag">Salary</span>
+            </div>
+          </div>
+
+          <!-- User uploaded datasets will appear here -->
+          <div id="dmUserDatasets"></div>
+        </div>
+      </div>
+
+      <!-- Data Table Viewer -->
+      <div class="dm-table-section" id="dmTableSection" style="display:none;">
+        <div class="dm-table-header">
+          <h3><i class="fas fa-table"></i> <span id="dmTableTitle">Dataset Viewer</span></h3>
+          <div class="dm-table-controls">
+            <div class="dm-search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Search rows..." id="dmTableSearch" oninput="filterDataTable(this.value)">
+            </div>
+            <button class="dm-btn" onclick="closeDataTable()"><i class="fas fa-xmark"></i> Close</button>
+          </div>
+        </div>
+        <div class="dm-table-wrapper">
+          <table class="dm-table" id="dmDataTable">
+            <thead id="dmTableHead"></thead>
+            <tbody id="dmTableBody"></tbody>
+          </table>
+        </div>
+        <div class="dm-pagination" id="dmPagination"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="dashToastContainer"></div>
+
+  <!-- Search Modal -->
+  <div class="modal-overlay" id="searchModal">
+    <div class="search-modal-content">
+      <div class="search-modal-input">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search pages, features, settings..." id="searchModalInput" oninput="filterSearchResults(this.value)">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-group">
+          <h4>Pages</h4>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('dashboard')"><i class="fas fa-grid-2"></i> Dashboard</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('analytics')"><i class="fas fa-chart-mixed"></i> Job Analytics</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('salary')"><i class="fas fa-indian-rupee-sign"></i> Salary Insights</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('skills')"><i class="fas fa-crosshairs"></i> Skill Gap Analyzer</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('resume')"><i class="fas fa-file-lines"></i> Resume Analyzer</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('coach')"><i class="fas fa-robot"></i> AI Career Coach</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('predictions')"><i class="fas fa-crystal-ball"></i> Predictions</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('saved')"><i class="fas fa-bookmark"></i> Saved Jobs</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('datamanager')"><i class="fas fa-database"></i> Data Manager</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('profile')"><i class="fas fa-user"></i> Profile</a>
+          <a href="#" class="search-result-item" onclick="goToFromSearch('settings')"><i class="fas fa-gear"></i> Settings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="data/datasets.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

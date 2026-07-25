@@ -1,0 +1,13 @@
+{
+  "name": "jobanalyzer",
+  "version": "1.0.0",
+  "description": "AI-Powered Job Market Intelligence - Analyze trends, discover skills, predict opportunities",
+  "scripts": {
+    "dev": "npx -y serve .",
+    "start": "npx -y serve .",
+    "build": "echo 'Static site - no build required'"
+  },
+  "keywords": ["job-market", "ai", "career", "analytics"],
+  "author": "JobAnalyzer",
+  "license": "MIT"
+}

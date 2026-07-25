@@ -1,0 +1,22 @@
+{
+  "name": "JobAnalyzer - AI-Powered Job Market Intelligence",
+  "short_name": "JobAnalyzer",
+  "description": "Analyze job market trends, discover in-demand skills, predict future opportunities and accelerate your career with AI insights.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e27",
+  "theme_color": "#0a0e27",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "productivity", "education"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
