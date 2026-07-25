@@ -45,32 +45,96 @@ function togglePassword(btn) {
   icon.classList.toggle('fa-eye-slash', !show);
 }
 
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
   const btn = document.getElementById('loginSubmitBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
   setBtnLoading(btn, true);
-  setTimeout(() => {
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
     setBtnLoading(btn, false);
+
+    if (!res.ok || data.error) {
+      showToast(data.error || 'Login failed. Please try again.', true);
+      return;
+    }
+
+    saveSession(data.access_token, data.user);
     closeAuthModal();
-    showToast('Logged in successfully.');
-  }, 900);
+    showToast(`Welcome back, ${data.user.name || data.user.email}!`);
+    refreshAuthUI();
+  } catch (err) {
+    setBtnLoading(btn, false);
+    showToast('Could not reach the server. Please try again.', true);
+  }
 }
 
-function handleSignup(event) {
+async function handleSignup(event) {
   event.preventDefault();
-  const pw = document.getElementById('signupPassword').value;
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
   const confirm = document.getElementById('signupConfirmPassword').value;
-  if (pw !== confirm) {
+
+  if (password !== confirm) {
     showToast('Passwords do not match.', true);
     return;
   }
+
   const btn = document.getElementById('signupSubmitBtn');
   setBtnLoading(btn, true);
-  setTimeout(() => {
+  try {
+    const res = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
     setBtnLoading(btn, false);
+
+    if (!res.ok || data.error) {
+      showToast(data.error || 'Signup failed. Please try again.', true);
+      return;
+    }
+
     closeAuthModal();
-    showToast('Account created. Welcome to JobAnalyzer.');
-  }, 900);
+    showToast('Account created! Please check your email to confirm, then log in.');
+    switchAuthTab('login');
+  } catch (err) {
+    setBtnLoading(btn, false);
+    showToast('Could not reach the server. Please try again.', true);
+  }
+}
+
+/* ---------- Session helpers ---------- */
+function saveSession(token, user) {
+  localStorage.setItem('jobanalyzer_token', token || '');
+  localStorage.setItem('jobanalyzer_user', JSON.stringify(user || {}));
+}
+function getSession() {
+  const token = localStorage.getItem('jobanalyzer_token');
+  const userRaw = localStorage.getItem('jobanalyzer_user');
+  if (!token || !userRaw) return null;
+  try { return { token, user: JSON.parse(userRaw) }; } catch { return null; }
+}
+function clearSession() {
+  localStorage.removeItem('jobanalyzer_token');
+  localStorage.removeItem('jobanalyzer_user');
+}
+function refreshAuthUI() {
+  const session = getSession();
+  const loginBtn = document.getElementById('navLoginBtn');
+  if (loginBtn && session) {
+    loginBtn.textContent = session.user.name || session.user.email;
+    loginBtn.onclick = () => { clearSession(); refreshAuthUI(); showToast('Logged out.'); };
+  }
 }
 
 function setBtnLoading(btn, loading) {
@@ -284,4 +348,5 @@ document.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   animateCounters();
   startTypewriter();
+  refreshAuthUI();
 });
