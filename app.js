@@ -215,7 +215,13 @@ async function handleResumeUpload(event) {
     const formData = new FormData();
     formData.append('resume', file);
 
-    const res = await fetch('/api/analyze-resume', { method: 'POST', body: formData });
+    const session = getSession();
+    const headers = {};
+    if (session && session.token) {
+      headers['Authorization'] = `Bearer ${session.token}`;
+    }
+
+    const res = await fetch('/api/analyze-resume', { method: 'POST', headers, body: formData });
     const data = await res.json();
 
     clearInterval(tick);
@@ -238,6 +244,10 @@ async function handleResumeUpload(event) {
       const circumference = 339.29;
       const offset = circumference - (score / 100) * circumference;
       circle.style.strokeDashoffset = offset;
+
+      if (data.saved) {
+        showToast('Resume analysis saved to your account.');
+      }
     }, 300);
 
   } catch (err) {
