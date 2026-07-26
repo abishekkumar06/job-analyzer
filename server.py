@@ -23,6 +23,66 @@ CORS(app)
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
 
+
+def get_user_from_token(token):
+    """Return the Supabase user object for a given access token, or None."""
+    if not token:
+        return None
+    try:
+        resp = http_requests.get(
+            f'{SUPABASE_URL}/auth/v1/user',
+            headers={'apikey': SUPABASE_ANON_KEY, 'Authorization': f'Bearer {token}'},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            return resp.json()
+    except http_requests.exceptions.RequestException:
+        pass
+    return None
+
+
+def upsert_profile(token, user_id, name='', phone='', email=''):
+    """Create or update a row in public.profiles for this user. Best-effort, never raises."""
+    try:
+        http_requests.post(
+            f'{SUPABASE_URL}/rest/v1/profiles',
+            headers={
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+                'Prefer': 'resolution=merge-duplicates',
+            },
+            json={'id': user_id, 'name': name, 'phone': phone, 'email': email},
+            timeout=10
+        )
+    except http_requests.exceptions.RequestException:
+        pass
+
+
+def save_resume_record(token, user_id, filename, ats_score, skills, job_matches, learning_path):
+    """Insert a row into public.resumes for this user. Best-effort, never raises."""
+    try:
+        http_requests.post(
+            f'{SUPABASE_URL}/rest/v1/resumes',
+            headers={
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal',
+            },
+            json={
+                'user_id': user_id,
+                'filename': filename,
+                'ats_score': ats_score,
+                'extracted_skills': skills,
+                'job_matches': job_matches,
+                'learning_path': learning_path,
+            },
+            timeout=10
+        )
+    except http_requests.exceptions.RequestException:
+        pass
+
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '/tmp/uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -736,7 +796,19 @@ def analyze_resume():
                 'has_certifications': bool(sections.get('certifications', '').strip()),
             }
         }
-        
+
+        # 8. Save to database if the request came from a logged-in user
+        auth_header = request.headers.get('Authorization', '')
+        if auth_header.startswith('Bearer '):
+            token = auth_header[7:].strip()
+            current_user = get_user_from_token(token)
+            if current_user:
+                save_resume_record(
+                    token, current_user.get('id'), file.filename, ats_score,
+                    list(found_skills.keys()), job_matches[:8], learning_path
+                )
+                response['saved'] = True
+
         return jsonify(response)
         
     except ValueError as e:
@@ -821,18 +893,56 @@ def login():
             return jsonify({'error': msg}), 401
 
         user = result.get('user', {})
+        access_token = result.get('access_token')
+        name = (user.get('user_metadata') or {}).get('name', '')
+        phone = (user.get('user_metadata') or {}).get('phone', '')
+
+        upsert_profile(access_token, user.get('id'), name=name, phone=phone, email=user.get('email', ''))
+
         return jsonify({
             'success': True,
-            'access_token': result.get('access_token'),
+            'access_token': access_token,
             'user': {
                 'id': user.get('id'),
                 'email': user.get('email'),
-                'name': (user.get('user_metadata') or {}).get('name', ''),
-                'phone': (user.get('user_metadata') or {}).get('phone', ''),
+                'name': name,
+                'phone': phone,
             }
         })
     except http_requests.exceptions.RequestException:
         return jsonify({'error': 'Could not reach authentication service'}), 502
+
+
+@app.route('/api/resumes', methods=['GET'])
+def get_resumes():
+    """Return the logged-in user's saved resume analysis history."""
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return jsonify({'error': 'Login required'}), 401
+
+    token = auth_header[7:].strip()
+    current_user = get_user_from_token(token)
+    if not current_user:
+        return jsonify({'error': 'Invalid or expired session'}), 401
+
+    try:
+        resp = http_requests.get(
+            f'{SUPABASE_URL}/rest/v1/resumes',
+            headers={
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': f'Bearer {token}',
+            },
+            params={
+                'user_id': f'eq.{current_user.get("id")}',
+                'order': 'created_at.desc',
+            },
+            timeout=10
+        )
+        if resp.status_code >= 400:
+            return jsonify({'error': 'Could not load resume history'}), 502
+        return jsonify({'success': True, 'resumes': resp.json()})
+    except http_requests.exceptions.RequestException:
+        return jsonify({'error': 'Could not reach database'}), 502
 
 
 @app.route('/api/health', methods=['GET'])
